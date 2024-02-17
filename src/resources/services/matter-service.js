@@ -72,24 +72,36 @@ export class MatterService {
         // Assuming you have a reference to the world or composite where the circles are located
         this._matter.Composite.allBodies(this._engine.world).forEach(body => {
             if (body.circleRadius) {
-                const speedX = 10;
-                const speedY = 10;
                 // This body is a circle, you can perform operations on it here
+                var positionX = body.position.x;
+                var positionY = body.position.y;
+                const dx = x - positionX;
+                const dy = y - positionY;
+                const angle = Math.atan2(dy, dx);
+                this.Body.setAngle(body, angle);
+
+                const speedX = 10 * Math.cos(angle);
+                const speedY = 10 * Math.sin(angle);
                 this.Body.setVelocity(body, { x: speedX, y: speedY });
-                this.Body.setAngle(body, 0); // radians
             }
         });
     }
 
-    setPucks(pucks) {
-        pucks.forEach(puck => {
-            this._puck = this.Bodies.circle(...puck, {
+    setBalls(balls) {
+        balls.forEach(ball => {
+            this._ball = this.Bodies.circle(...ball, {
+                friction: 0,
+                frictionAir: 0,
+                frictionStatic: 0,
+                inverseInertia: 0,
+                restitution: 1,
                 render: {
                     fillStyle: 'goldenrod',
                     lineWidth: 0
                 }
             });
-            this.World.add(this._engine.world, this._puck);
+            console.log(this._ball);
+            this.World.add(this._engine.world, this._ball);
         });
     }
 

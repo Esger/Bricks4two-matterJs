@@ -31,7 +31,7 @@ export class GameScreenCustomElement {
         const arena = this._getArena();
 
         this._setWalls();
-        this._setPucks();
+        this._setBalls();
         this._matterService.useMouse();
         this._matterService.startEngine();
         this._startGame();
@@ -69,13 +69,13 @@ export class GameScreenCustomElement {
         this._matterService.clearArena();
     }
 
-    _setPucks() {
+    _setBalls() {
         this._pucks = [];
         const arena = this._getArena();
         const player = [arena.width / 2, arena.height / 4 * 3, this._puckSize];
         const opponent = [arena.width / 2, arena.height / 4, this._puckSize];
         this._pucks.push(player, opponent);
-        this._matterService.setPucks(this._pucks);
+        this._matterService.setBalls(this._pucks);
     }
 
     _setWalls() {
