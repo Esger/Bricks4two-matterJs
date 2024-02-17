@@ -1,10 +1,5 @@
-import {
-    inject,
-    bindable
-} from 'aurelia-framework';
-import {
-    EventAggregator
-} from 'aurelia-event-aggregator';
+import { inject } from 'aurelia-framework';
+import { EventAggregator } from 'aurelia-event-aggregator';
 import { MatterService } from '../services/matter-service';
 // import { Puck } from './puck';
 
