@@ -12,12 +12,12 @@ export class MatterService {
         this.Render = matter.Render;
         this.World = matter.World;
         this.Bodies = matter.Bodies;
+        this.Body = matter.Body;
+        this.Events = matter.Events;
+        this.Mouse = matter.Mouse;
     }
 
     setWorld($world) {
-        $world = $world || $('body');
-        this._container = $world[0];
-        this._canvas = $('canvas')[0];
 
         this._engine = this.Engine.create();
         this._engine.world.gravity.y = 0;
@@ -27,17 +27,20 @@ export class MatterService {
             height: $world.height(),
             wireframes: false // om vulkleur te kunnen gebruiken
         };
+
+        $world = $world || $('body');
+        this._container = $world[0];
         this._render = this.Render.create({
             element: this._container,
             engine: this._engine,
             options: renderOptions
         });
+        this._canvas = $('canvas')[0];
     }
 
     useMouse() {
-        let mouseConstraint = this._matter.MouseConstraint.create(
-            this._engine, { //Create Constraint
-            element: this._canvas,
+        const mouseConstraint = this._matter.MouseConstraint.create(
+            this._engine, { // Create Constraint
             constraint: {
                 render: {
                     visible: false
@@ -65,15 +68,50 @@ export class MatterService {
         this.Render.run(this._render);
     }
 
-    setPucks(pucks) {
-        pucks.forEach(puck => {
-            this._puck = this.Bodies.circle(...puck, {
+    moveBalls(x, y, speed) {
+        this._baseSpeed = speed;
+        // Assuming you have a reference to the world or composite where the circles are located
+        this._matter.Composite.allBodies(this._engine.world).filter(body => body.circleRadius).forEach(body => {
+            var positionX = body.position.x;
+            var positionY = body.position.y;
+            const dx = x - positionX;
+            const dy = y - positionY;
+            const angle = Math.atan2(dy, dx);
+            this.Body.setAngle(body, angle);
+            const speedX = speed * Math.cos(angle);
+            const speedY = speed * Math.sin(angle);
+            this.Body.setVelocity(body, { x: speedX, y: speedY });
+
+            console.log(body);
+        });
+    }
+
+    ballSpeedUpdater(factor) {
+        this._matter.Composite.allBodies(this._engine.world).filter(body => body.circleRadius).forEach(body => {
+            this._ballSpeedUpdaterInterval = setInterval(() => {
+                const angle = Math.atan2(body.velocity.y, body.velocity.x);
+                const speedX = this._baseSpeed * Math.cos(angle);
+                const speedY = this._baseSpeed * Math.sin(angle);
+                this.Body.setVelocity(body, { x: speedX, y: speedY });
+            }, 5000)
+        });
+    }
+
+    setBalls(balls) {
+        balls.forEach(ball => {
+            this._ball = this.Bodies.circle(...ball, {
+                friction: 0,
+                frictionAir: 0,
+                frictionStatic: 0,
+                inverseInertia: 0,
+                restitution: 1,
                 render: {
                     fillStyle: 'goldenrod',
                     lineWidth: 0
                 }
             });
-            this.World.add(this._engine.world, this._puck);
+            console.log(this._ball);
+            this.World.add(this._engine.world, this._ball);
         });
     }
 

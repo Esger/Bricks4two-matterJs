@@ -1,10 +1,5 @@
-import {
-    inject,
-    bindable
-} from 'aurelia-framework';
-import {
-    EventAggregator
-} from 'aurelia-event-aggregator';
+import { inject } from 'aurelia-framework';
+import { EventAggregator } from 'aurelia-event-aggregator';
 import { MatterService } from '../services/matter-service';
 // import { Puck } from './puck';
 
@@ -31,14 +26,15 @@ export class GameScreenCustomElement {
         const arena = this._getArena();
 
         this._setWalls();
-        this._setPucks();
+        this._setBalls();
         this._matterService.useMouse();
         this._matterService.startEngine();
-
+        this._startGame();
     }
 
     detached() {
         this._resizeObserver.disconnect();
+        $('canvas').off('click.start');
     }
 
     touchHandler(event) {
@@ -47,6 +43,14 @@ export class GameScreenCustomElement {
             //you can then prevent the behavior
             event.preventDefault();
         }
+    }
+
+    _startGame() {
+        $('canvas').on('click.start', (event) => {
+            const speed = 10;
+            this._matterService.moveBalls(event.clientX, event.clientY, speed);
+            this._matterService.ballSpeedUpdater(0);
+        });
     }
 
     _getArena() {
@@ -62,16 +66,13 @@ export class GameScreenCustomElement {
         this._matterService.clearArena();
     }
 
-    _setPucks() {
+    _setBalls() {
         this._pucks = [];
         const arena = this._getArena();
-        for (let i = 0; i < 10; i++) {
-            const left = this._puckSize * (i % 5);
-            const top = i < 5 ? 5 * this._puckSize : arena.height - 5 * this._puckSize;
-            const positionAndSize = [left, top, this._puckSize];
-            this._pucks.push(positionAndSize);
-        }
-        this._matterService.setPucks(this._pucks);
+        const player = [arena.width / 2, arena.height / 4 * 3, this._puckSize];
+        const opponent = [arena.width / 2, arena.height / 4, this._puckSize];
+        this._pucks.push(player, opponent);
+        this._matterService.setBalls(this._pucks);
     }
 
     _setWalls() {
