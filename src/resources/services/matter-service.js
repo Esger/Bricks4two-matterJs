@@ -71,26 +71,23 @@ export class MatterService {
     moveBalls(x, y, speed) {
         this._baseSpeed = speed;
         // Assuming you have a reference to the world or composite where the circles are located
-        this._matter.Composite.allBodies(this._engine.world).forEach(body => {
-            if (body.circleRadius) {
-                // This body is a circle, you can perform operations on it here
-                var positionX = body.position.x;
-                var positionY = body.position.y;
-                const dx = x - positionX;
-                const dy = y - positionY;
-                const angle = Math.atan2(dy, dx);
-                this.Body.setAngle(body, angle);
-                const speedX = speed * Math.cos(angle);
-                const speedY = speed * Math.sin(angle);
-                this.Body.setVelocity(body, { x: speedX, y: speedY });
-            }
+        this._matter.Composite.allBodies(this._engine.world).filter(body => body.circleRadius).forEach(body => {
+            var positionX = body.position.x;
+            var positionY = body.position.y;
+            const dx = x - positionX;
+            const dy = y - positionY;
+            const angle = Math.atan2(dy, dx);
+            this.Body.setAngle(body, angle);
+            const speedX = speed * Math.cos(angle);
+            const speedY = speed * Math.sin(angle);
+            this.Body.setVelocity(body, { x: speedX, y: speedY });
+
             console.log(body);
         });
     }
 
     ballSpeedUpdater(factor) {
         this._matter.Composite.allBodies(this._engine.world).filter(body => body.circleRadius).forEach(body => {
-            // This body is a circle, you can perform operations on it here
             this._ballSpeedUpdaterInterval = setInterval(() => {
                 const angle = Math.atan2(body.velocity.y, body.velocity.x);
                 const speedX = this._baseSpeed * Math.cos(angle);
