@@ -47,7 +47,9 @@ export class GameScreenCustomElement {
 
     _startGame() {
         $('canvas').on('click.start', (event) => {
-            this._matterService.moveBalls(event.clientX, event.clientY);
+            const speed = 10;
+            this._matterService.moveBalls(event.clientX, event.clientY, speed);
+            this._matterService.ballSpeedUpdater(0);
         });
     }
 
