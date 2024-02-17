@@ -34,11 +34,12 @@ export class GameScreenCustomElement {
         this._setPucks();
         this._matterService.useMouse();
         this._matterService.startEngine();
-
+        this._startGame();
     }
 
     detached() {
         this._resizeObserver.disconnect();
+        $('canvas').off('click.start');
     }
 
     touchHandler(event) {
@@ -47,6 +48,12 @@ export class GameScreenCustomElement {
             //you can then prevent the behavior
             event.preventDefault();
         }
+    }
+
+    _startGame() {
+        $('canvas').on('click.start', (event) => {
+            this._matterService.moveBalls(event.clientX, event.clientY);
+        });
     }
 
     _getArena() {
@@ -65,12 +72,9 @@ export class GameScreenCustomElement {
     _setPucks() {
         this._pucks = [];
         const arena = this._getArena();
-        for (let i = 0; i < 10; i++) {
-            const left = this._puckSize * (i % 5);
-            const top = i < 5 ? 5 * this._puckSize : arena.height - 5 * this._puckSize;
-            const positionAndSize = [left, top, this._puckSize];
-            this._pucks.push(positionAndSize);
-        }
+        const player = [arena.width / 2, arena.height / 4 * 3, this._puckSize];
+        const opponent = [arena.width / 2, arena.height / 4, this._puckSize];
+        this._pucks.push(player, opponent);
         this._matterService.setPucks(this._pucks);
     }
 

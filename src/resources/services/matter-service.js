@@ -12,12 +12,12 @@ export class MatterService {
         this.Render = matter.Render;
         this.World = matter.World;
         this.Bodies = matter.Bodies;
+        this.Body = matter.Body;
+        this.Events = matter.Events;
+        this.Mouse = matter.Mouse;
     }
 
     setWorld($world) {
-        $world = $world || $('body');
-        this._container = $world[0];
-        this._canvas = $('canvas')[0];
 
         this._engine = this.Engine.create();
         this._engine.world.gravity.y = 0;
@@ -27,17 +27,20 @@ export class MatterService {
             height: $world.height(),
             wireframes: false // om vulkleur te kunnen gebruiken
         };
+
+        $world = $world || $('body');
+        this._container = $world[0];
         this._render = this.Render.create({
             element: this._container,
             engine: this._engine,
             options: renderOptions
         });
+        this._canvas = $('canvas')[0];
     }
 
     useMouse() {
-        let mouseConstraint = this._matter.MouseConstraint.create(
-            this._engine, { //Create Constraint
-            element: this._canvas,
+        const mouseConstraint = this._matter.MouseConstraint.create(
+            this._engine, { // Create Constraint
             constraint: {
                 render: {
                     visible: false
@@ -63,6 +66,19 @@ export class MatterService {
     startEngine() {
         this.Engine.run(this._engine);
         this.Render.run(this._render);
+    }
+
+    moveBalls(x, y) {
+        // Assuming you have a reference to the world or composite where the circles are located
+        this._matter.Composite.allBodies(this._engine.world).forEach(body => {
+            if (body.circleRadius) {
+                const speedX = 10;
+                const speedY = 10;
+                // This body is a circle, you can perform operations on it here
+                this.Body.setVelocity(body, { x: speedX, y: speedY });
+                this.Body.setAngle(body, 0); // radians
+            }
+        });
     }
 
     setPucks(pucks) {
